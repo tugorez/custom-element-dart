@@ -4,22 +4,23 @@ import 'dart:html';
 @JS('CustomElement')
 abstract class _CustomElement {
   external void connectedCallback();
+  external void disconnetedCallback();
+  external void adoptedCallback();
+  external void attributeChangedCallback(String, dynamic dynamic);
 }
 
 @JS('createCustomElement')
 external _CustomElement _createCustomElement(
-  OnCreated onCreated,
-  OnConnected onConnected,
+  List<String> observedAttributes,
+  Function(HtmlElement) onCreated,
+  Function onConnected,
+  Function onDisconnected,
+  Function onAdopted,
+  Function(String, dynamic, dynamic) onAttributeChanged,
 );
 
 @JS('defineCustomElement')
-external void _defineCustomElement(
-  String tag,
-  _CustomElement element,
-);
-
-typedef OnCreated = void Function(HtmlElement element);
-typedef OnConnected = void Function();
+external void _defineCustomElement(String tag, _CustomElement element);
 
 class CustomElement {
   final HtmlElement element;
@@ -27,19 +28,26 @@ class CustomElement {
   CustomElement(this.element);
 
   onConnected() {}
+  onDisconnected() {}
+  onAdopted() {}
+  onAttributeChanged(String attrName, dynamic oldVal, dynamic newVal) {}
 }
 
-typedef CustomElementCreator = CustomElement Function(HtmlElement);
-
-void defineCustomElement(String tag, CustomElementCreator creator) {
+void defineCustomElement(
+  String tag,
+  List<String> observedAttributes,
+  CustomElement Function(HtmlElement) creator,
+) {
   late final CustomElement customElement;
-  final foo = _createCustomElement(
+  final ce = _createCustomElement(
+    observedAttributes,
     allowInterop((element) {
       customElement = creator(element);
     }),
-    allowInterop(() {
-      customElement.onConnected();
-    }),
+    allowInterop(() => customElement.onConnected()),
+    allowInterop(() => customElement.onDisconnected()),
+    allowInterop(() => customElement.onAdopted()),
+    allowInterop((a, o, n) => customElement.onAttributeChanged(a, o, n)),
   );
-  _defineCustomElement(tag, foo);
+  _defineCustomElement(tag, ce);
 }
