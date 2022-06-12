@@ -38,6 +38,7 @@ void defineCustomElement(
   List<String> observedAttributes,
   CustomElement Function(HtmlElement) creator,
 ) {
+  // Somethin weird is going on. If you create a new element this breaks.
   late final CustomElement customElement;
   final ce = _createCustomElement(
     observedAttributes,
