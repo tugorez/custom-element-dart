@@ -11,5 +11,5 @@ class HelloWorldElement extends CustomElement {
 }
 
 void main() {
-  defineCustomElement('hello-world', (e) => HelloWorldElement(e));
+  defineCustomElement('hello-world', HelloWorldElement.new);
 }
