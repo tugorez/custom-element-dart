@@ -1,20 +1,17 @@
-function createCustomElement(tag, customElementConstructor) {
-  let dartElement = null;
-
+function createCustomElement(onCreated, onConnected) {
   function CustomElement() {
-    let element = Reflect.construct(HTMLElement, [], CustomElement);
-    dartElement = customElementConstructor(element);
+    const element = Reflect.construct(HTMLElement, [], CustomElement);
+    onCreated(element);
     return element;
   }
 
   CustomElement.prototype = Object.create(HTMLElement.prototype);
 
-  CustomElement.prototype.connectedCallback = function () {
-    if (dartElement != null) {
-      dartElement.onConnected();
-    }
-  };
+  CustomElement.prototype.connectedCallback = onConnected;
 
-  // Register the World element.
-  customElements.define(tag, CustomElement);
+  return CustomElement;
+}
+
+function defineCustomElement(tag, customElement) {
+  customElements.define(tag, customElement);
 }

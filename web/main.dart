@@ -1,21 +1,27 @@
-import 'dart:html';
-import 'package:js/js.dart';
 import 'package:custom_element_dart/custom_element.dart';
+import 'package:js/js.dart';
+import 'dart:html';
 
-class HelloWorldElement extends CustomElement {
-  static final tag = 'hello-world';
-
+class HelloWorldElement {
   final HtmlElement element;
 
   HelloWorldElement(this.element);
 
-  @override
-  void onConnected() {
+  onConnected() {
     element.innerText = 'Hello World!';
   }
 }
 
 void main() {
-  createCustomElement(
-      'hello-world', allowInterop((element) => HelloWorldElement(element)));
+  late final HelloWorldElement element;
+  final customElement = createCustomElement(
+    allowInterop((e) {
+      element = HelloWorldElement(e);
+    }),
+    allowInterop(() {
+      element.onConnected();
+    }),
+  );
+
+  defineCustomElement('hello-world', customElement);
 }
