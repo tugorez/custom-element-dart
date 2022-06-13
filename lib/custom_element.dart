@@ -12,11 +12,7 @@ abstract class _CustomElement {
 @JS('createCustomElement')
 external _CustomElement _createCustomElement(
   List<String> observedAttributes,
-  Function(HtmlElement) onCreated,
-  Function onConnected,
-  Function onDisconnected,
-  Function onAdopted,
-  Function(String, dynamic, dynamic) onAttributeChanged,
+  List<Function> Function(HtmlElement) onCreated,
 );
 
 @JS('defineCustomElement')
@@ -39,16 +35,17 @@ void defineCustomElement(
   CustomElement Function(HtmlElement) creator,
 ) {
   // Somethin weird is going on. If you create a new element this breaks.
-  late final CustomElement customElement;
   final ce = _createCustomElement(
     observedAttributes,
     allowInterop((element) {
-      customElement = creator(element);
+      final customElement = creator(element);
+      return [
+        allowInterop(customElement.onConnected),
+        allowInterop(customElement.onDisconnected),
+        allowInterop(customElement.onAdopted),
+        allowInterop((a, b, c) => customElement.onAttributeChanged(a, b, c)),
+      ];
     }),
-    allowInterop(() => customElement.onConnected()),
-    allowInterop(() => customElement.onDisconnected()),
-    allowInterop(() => customElement.onAdopted()),
-    allowInterop((a, o, n) => customElement.onAttributeChanged(a, o, n)),
   );
   _defineCustomElement(tag, ce);
 }

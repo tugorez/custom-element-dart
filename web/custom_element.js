@@ -1,33 +1,30 @@
-function createCustomElement(
-  observedAttributes,
-  onCreated,
-  onConnected,
-  onDisconnected,
-  onAdopted,
-  onAttributeChanged
-) {
+function createCustomElement(observedAttributes, onCreated) {
   class CustomElement extends HTMLElement {
     static observedAttributes = observedAttributes;
 
     constructor() {
       super();
-      onCreated(this);
+      const dartObject = onCreated(this);
+      this.onConnected = dartObject[0];
+      this.disconnected = dartObject[1];
+      this.onAdopted = dartObject[2];
+      this.onAttributeChanged = dartObject[3];
     }
 
     connectedCallback() {
-      onConnected();
+      this.onConnected();
     }
 
     disconnectedCallback() {
-      onDisconnected();
+      this.onDisconnected();
     }
 
     adoptedCallback() {
-      onAdopted();
+      this.onAdopted();
     }
 
     attributeChangedCallback(a, b, c, whatIsThis) {
-      onAttributeChanged(a, b, c);
+      this.onAttributeChanged(a, b, c);
     }
   }
 
