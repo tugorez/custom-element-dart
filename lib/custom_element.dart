@@ -2,12 +2,7 @@ import 'package:js/js.dart';
 import 'dart:html';
 
 @JS('CustomElement')
-abstract class _CustomElement {
-  external void connectedCallback();
-  external void disconnetedCallback();
-  external void adoptedCallback();
-  external void attributeChangedCallback(String, dynamic dynamic);
-}
+abstract class _CustomElement {}
 
 @JS('createCustomElement')
 external _CustomElement _createCustomElement(
