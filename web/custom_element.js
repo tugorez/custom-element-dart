@@ -6,7 +6,7 @@ function createCustomElement(observedAttributes, onCreated) {
       super();
       const dartObject = onCreated(this);
       this.onConnected = dartObject[0];
-      this.disconnected = dartObject[1];
+      this.onDisconnected = dartObject[1];
       this.onAdopted = dartObject[2];
       this.onAttributeChanged = dartObject[3];
     }
