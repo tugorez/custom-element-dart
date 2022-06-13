@@ -6,23 +6,30 @@ function createCustomElement(
   onAdopted,
   onAttributeChanged
 ) {
-  function CustomElement() {
-    const element = Reflect.construct(HTMLElement, [], CustomElement);
-    onCreated(element);
-    return element;
-  }
+  class CustomElement extends HTMLElement {
+    static observedAttributes = observedAttributes;
 
-  CustomElement.observedAttributes = observedAttributes;
-  CustomElement.prototype = Object.create(HTMLElement.prototype);
-  CustomElement.prototype.connectedCallback = onConnected;
-  CustomElement.prototype.disconnectedCallback = onDisconnected;
-  CustomElement.prototype.adoptedCallback = onAdopted;
-  CustomElement.prototype.attributeChangedCallback = (
-    attributeName,
-    oldValue,
-    newValue,
-    whatIsThisArgument //dunno why this thing is injecting 4 arguments.
-  ) => onAttributeChanged(attributeName, oldValue, newValue);
+    constructor() {
+      super();
+      onCreated(this);
+    }
+
+    connectedCallback() {
+      onConnected();
+    }
+
+    disconnectedCallback() {
+      onDisconnected();
+    }
+
+    adoptedCallback() {
+      onAdopted();
+    }
+
+    attributeChangedCallback(a, b, c, whatIsThis) {
+      onAttributeChanged(a, b, c);
+    }
+  }
 
   return CustomElement;
 }
