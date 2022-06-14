@@ -1,17 +1,12 @@
 import 'package:js/js.dart';
 import 'dart:html';
 
-@JS('CustomElement')
-abstract class _CustomElement {}
-
-@JS('createCustomElement')
-external _CustomElement _createCustomElement(
-  List<String> observedAttributes,
-  List<Function> Function(HtmlElement) onCreated,
-);
-
 @JS('defineCustomElement')
-external void _defineCustomElement(String tag, _CustomElement element);
+external void _defineCustomElement(
+  String tag,
+  List<String> observedAttributes,
+  List<Function> Function(HtmlElement) getDartCustomElementHooks,
+);
 
 class CustomElement {
   final HtmlElement element;
@@ -29,8 +24,8 @@ void defineCustomElement(
   List<String> observedAttributes,
   CustomElement Function(HtmlElement) creator,
 ) {
-  // Somethin weird is going on. If you create a new element this breaks.
-  final ce = _createCustomElement(
+  _defineCustomElement(
+    tag,
     observedAttributes,
     allowInterop((element) {
       final customElement = creator(element);
@@ -38,9 +33,8 @@ void defineCustomElement(
         allowInterop(customElement.onConnected),
         allowInterop(customElement.onDisconnected),
         allowInterop(customElement.onAdopted),
-        allowInterop((a, b, c) => customElement.onAttributeChanged(a, b, c)),
+        allowInterop(customElement.onAttributeChanged),
       ];
     }),
   );
-  _defineCustomElement(tag, ce);
 }

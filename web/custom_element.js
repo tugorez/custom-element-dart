@@ -1,14 +1,18 @@
-function createCustomElement(observedAttributes, onCreated) {
+function defineCustomElement(
+  tag,
+  observedAttributes,
+  getDartCustomElementHooks
+) {
   class CustomElement extends HTMLElement {
     static observedAttributes = observedAttributes;
 
     constructor() {
       super();
-      const dartObject = onCreated(this);
-      this.onConnected = dartObject[0];
-      this.onDisconnected = dartObject[1];
-      this.onAdopted = dartObject[2];
-      this.onAttributeChanged = dartObject[3];
+      const dartCustomElementHooks = getDartCustomElementHooks(this);
+      this.onConnected = dartCustomElementHooks[0];
+      this.onDisconnected = dartCustomElementHooks[1];
+      this.onAdopted = dartCustomElementHooks[2];
+      this.onAttributeChanged = dartCustomElementHooks[3];
     }
 
     connectedCallback() {
@@ -23,14 +27,10 @@ function createCustomElement(observedAttributes, onCreated) {
       this.onAdopted();
     }
 
-    attributeChangedCallback(a, b, c, whatIsThis) {
-      this.onAttributeChanged(a, b, c);
+    attributeChangedCallback(attrName, oldVal, newVal, whatIsThis) {
+      this.onAttributeChanged(attrName, oldVal, newVal);
     }
   }
 
-  return CustomElement;
-}
-
-function defineCustomElement(tag, customElement) {
-  customElements.define(tag, customElement);
+  customElements.define(tag, CustomElement);
 }
